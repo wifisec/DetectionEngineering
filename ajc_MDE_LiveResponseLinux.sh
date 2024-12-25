@@ -24,7 +24,7 @@
 #     Adair John Collins
 #
 # VERSION
-#     1.1
+#     1.11
 # --------------------------------------------------------------------
 COMMENT_BLOCK
 
@@ -42,7 +42,7 @@ DATETIME=$(date +"%Y%m%d_%H%M%S")
 BASE_DIR="$HOME_DIR/collected_files_$DATETIME"
 DEST_DIR="$BASE_DIR/files"
 LOG_FILE="$BASE_DIR/collection_log.txt"
-ARCHIVE_PATH="$BASE_DIR/collected_files.zip"
+ARCHIVE_PATH="$BASE_DIR/collected_files.tar.gz"
 
 # Create the necessary directories
 mkdir -p "$DEST_DIR"
@@ -86,6 +86,15 @@ cleanup() {
     rm -rf "$DEST_DIR"
     echo "Cleanup complete. Collected files removed."
 }
+
+# Ensure tar and gzip are installed
+if ! command -v tar &> /dev/null || ! command -v gzip &> /dev/null; then
+    if [ -f /etc/redhat-release ]; then
+        sudo yum install -y tar gzip
+    elif [ -f /etc/debian_version ]; then
+        sudo apt-get install -y tar gzip
+    fi
+fi
 
 # Collect specified files
 collect_file "/etc/ssh/sshd_config"
@@ -172,7 +181,7 @@ collect_file "/etc/crontab"
 collect_directory "/etc/systemd/system"
 
 # Compress all collected files into a single archive
-zip -r "$ARCHIVE_PATH" "$DEST_DIR" "$LOG_FILE"
+tar -czvf "$ARCHIVE_PATH" -C "$BASE_DIR" files collection_log.txt
 
 # Clean up collected files
 cleanup
