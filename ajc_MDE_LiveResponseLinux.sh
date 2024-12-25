@@ -14,6 +14,7 @@
 #         - Collect specified files and directories.
 #         - Log detailed information about each collected file.
 #         - Compress the collected files and log into a single archive.
+#         - Clean up the collected files after compression.
 #
 # REFERENCES
 #     https://techcommunity.microsoft.com/blog/microsoftdefenderatpblog/announcing-live-response-for-macos-and-linux/2864397
@@ -23,7 +24,7 @@
 #     Adair John Collins
 #
 # VERSION
-#     1.0
+#     1.1
 # --------------------------------------------------------------------
 COMMENT_BLOCK
 
@@ -78,6 +79,12 @@ collect_directory() {
     else
         log_info "Directory not found: $dir_path"
     fi
+}
+
+# Function to clean up collected files
+cleanup() {
+    rm -rf "$DEST_DIR"
+    echo "Cleanup complete. Collected files removed."
 }
 
 # Collect specified files
@@ -167,4 +174,7 @@ collect_directory "/etc/systemd/system"
 # Compress all collected files into a single archive
 zip -r "$ARCHIVE_PATH" "$DEST_DIR" "$LOG_FILE"
 
-echo "File collection complete. Collected files are stored in $DEST_DIR and compressed into $ARCHIVE_PATH. Log file is included in the archive."
+# Clean up collected files
+cleanup
+
+echo "File collection complete. Collected files are stored in $ARCHIVE_PATH. Log file is included in the archive."

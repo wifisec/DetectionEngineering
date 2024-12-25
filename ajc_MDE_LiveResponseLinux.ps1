@@ -11,6 +11,7 @@
         - Collect specified files and directories.
         - Log detailed information about each collected file.
         - Compress the collected files and log into a single archive.
+        - Clean up the collected files after compression.
 
 .REFERENCES
     https://techcommunity.microsoft.com/blog/microsoftdefenderatpblog/announcing-live-response-for-macos-and-linux/2864397
@@ -20,7 +21,7 @@
     Adair John Collins
 
 .VERSION
-    1.0
+    1.1
 #>
 
 # Identify the MDTAP user's home directory
@@ -85,6 +86,12 @@ function Collect-Directory {
     } else {
         Log-Info "Directory not found: $DirPath"
     }
+}
+
+# Function to clean up collected files
+function Cleanup {
+    Remove-Item -Path $DestDir -Recurse -Force
+    Write-Output "Cleanup complete. Collected files removed."
 }
 
 # Collect specified files
@@ -180,4 +187,7 @@ Compress-Archive -Path "$DestDir/*" -DestinationPath $ArchivePath
 # Include the log file in the archive
 Compress-Archive -Path $LogFile -Update -DestinationPath $ArchivePath
 
-Write-Output "File collection complete. Collected files are stored in $DestDir and compressed into $ArchivePath. Log file is included in the archive."
+# Clean up collected files
+Cleanup
+
+Write-Output "File collection complete. Collected files are stored in $ArchivePath. Log file is included in the archive."
