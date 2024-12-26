@@ -156,6 +156,8 @@ collect_file "/etc/iptables/rules.v6"
 collect_file "/etc/network/interfaces"
 collect_directory "/etc/sysconfig/network-scripts"
 collect_directory "/etc/ufw"
+collect_file "/root/anaconda-ks.cfg"
+collect_file "/root/ks.cfg"
 
 # Collect fstab and other file system configuration files
 collect_file "/etc/fstab"
