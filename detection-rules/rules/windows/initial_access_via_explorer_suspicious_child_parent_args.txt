@@ -1,0 +1,25 @@
+// Define a list of potentially suspicious command-line utilities.
+let susCmds = datatable(Value:string)["cscript", "wscript", "powershell", "pwsh", "rundll32", "cmd", "mshta", "regsvr32", "curl"];
+// Define a list of suspicious file paths that may indicate malicious activity.
+let susPath = datatable(Value:string)[@"\Users\", @"\Downloads\", @"\MicrosoftEdgeDownloads\", @"\AppData\", @"\Temp\", @"\ProgData\", @"\Public\"]; //Additional subdirectories within Users added for easier customization
+// Define a list of suspicious file extensions associated with scripts, executables, or other potentially malicious files.
+let susExt = datatable(Value:string)[".bat", ".cmd", ".ps1", ".js", ".exe", ".scr", ".pif", ".dll"];
+// Combine all suspicious elements into a single table for easier filtering.
+let Combined = union susCmds, susPath, susExt;
+DeviceProcessEvents
+| where InitiatingProcessFileName has_any("explorer.exe", "cmd.exe", "powershell.exe", "pwsh.exe", "wt.exe", "WindowsTerminal.exe") //Optional
+// Limit the query to processes running with Medium integrity level (typically normal user privileges).
+| where ProcessIntegrityLevel has "Medium" //Optional
+// Filter processes that correspond to instances of Explorer.exe.
+| where FolderPath has_any (@":\Windows\explorer.exe", @":\Windows\SysWOW64\explorer.exe")
+// Detect suspicious executions where Explorer is run with "/root" or "-root" arguments,
+// and also where the command line contains elements from the predefined suspicious parameters.
+| where (ProcessCommandLine has "explorer" and ProcessCommandLine has_any(@"/root", @"-root")) and ProcessCommandLine has_any(Combined)
+// Exclude known false positives, such as Skype settings, Control Panel GUIDs, and ANCILE uPerform paths.
+| where not(ProcessCommandLine has_any(@"skype-mrx://settings/", @"{21ec2020-3aea-1069-a2dd-08002b30309d}", @"\ANCILE\uPerform\"))
+// Exclude cases where Explorer is launched with "/root,c:" as this is a normal File Explorer startup command.
+| where ProcessCommandLine !='"explorer.exe" /root,c:'
+// Sort results by ProcessCommandLine for easier analysis.
+| sort by ProcessCommandLine
+// External references providing further context and detection logic.
+// References: ["https://x.com/wietze/status/1930943488272523517?s=42", "https://lolbas-project.github.io/lolbas/Binaries/Explorer/", "https://github.com/elastic/detection-rules/blob/f2bc0c685d83db7db395fc3dc4b9729759cd4329/rules/windows/initial_access_via_explorer_suspicious_child_parent_args.toml"]
