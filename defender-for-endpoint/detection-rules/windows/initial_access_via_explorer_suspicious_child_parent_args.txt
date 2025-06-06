@@ -3,7 +3,7 @@ let susCmds = datatable(Value:string)["cscript", "wscript", "powershell", "pwsh"
 // Define a list of suspicious file paths that may indicate malicious activity.
 let susPath = datatable(Value:string)[@"\Users\", @"\Downloads\", @"\MicrosoftEdgeDownloads\", @"\AppData\", @"\Temp\", @"\ProgData\", @"\Public\"]; //Additional subdirectories within Users added for easier customization
 // Define a list of suspicious file extensions associated with scripts, executables, or other potentially malicious files.
-let susExt = datatable(Value:string)[".bat", ".cmd", ".ps1", ".js", ".exe", ".scr", ".pif", ".dll"];
+let susExt = datatable(Value:string)[".bat", ".cmd", ".ps1", ".js", ".vbs", ".exe", ".scr", ".pif", ".dll"];
 // Combine all suspicious elements into a single table for easier filtering.
 let Combined = union susCmds, susPath, susExt;
 DeviceProcessEvents
