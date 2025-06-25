@@ -1,1 +1,1 @@
-"Hello World" | Out-File -FilePath "flag.txt"
+"Hello World" | Out-File -FilePath "$env:TEMP\flag.txt"
