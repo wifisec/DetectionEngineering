@@ -1,1 +1,1 @@
-"Hello World" | Out-File -FilePath "c:\windows\temp\flag.txt"
+Write-Output "Hello World" | Out-File -FilePath "$env:TEMP\flag.txt"
