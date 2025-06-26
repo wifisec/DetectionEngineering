@@ -1,6 +1,6 @@
 # Define the message and target path
 $message = "Hello World"
-$tempFolder = $env:WINDIR + "\Temp"
+$tempFolder = $env:TEMP  # User's temp directory
 $fileName = "flag.txt"
 $filePath = Join-Path -Path $tempFolder -ChildPath $fileName
 
