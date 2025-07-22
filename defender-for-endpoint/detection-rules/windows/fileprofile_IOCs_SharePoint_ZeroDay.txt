@@ -1,0 +1,43 @@
+union
+(
+ DeviceFileEvents
+ | project SHA256 = "92bb4ddb98eeaf11fc15bb32e71d0a63256a0ed826a03ba293ce3a8bf057a514" // webshell
+ | invoke FileProfile("SHA256", 1)
+),
+(
+ DeviceFileEvents
+ | project SHA256 = "4a02a72aedc3356d8cb38f01f0e0b9f26ddc5ccb7c0f04a561337cf24aa84030" // backdoor
+ | invoke FileProfile("SHA256", 1)
+),
+(
+ DeviceFileEvents
+ | project SHA256 = "b39c14becb62aeb55df7fd55c814afbb0d659687d947d917512fe67973100b70" // dropper
+ | invoke FileProfile("SHA256", 1)
+),
+(
+ DeviceFileEvents
+ | project SHA256 = "fa3a74a6c015c801f5341c02be2cbdfb301c6ed60633d49fc0bc723617741af7" // PHP payload
+ | invoke FileProfile("SHA256", 1)
+),
+(
+ DeviceFileEvents
+ | project SHA256 = "e9e87f2d9446eae3e5dbca8ac4e98f1523e7a2dcf8a04197f34f20c3b1c79d60" // stager
+ | invoke FileProfile("SHA256", 1)
+),
+(
+ DeviceFileEvents
+ | project SHA256 = "b1cf5c9c3c798cae1f2b23d26ec77aa019f90eeed0f3b5d227b7490ed2593f93" // exploit
+ | invoke FileProfile("SHA256", 1)
+)
+| distinct SHA256, GlobalPrevalence, GlobalFirstSeen, GlobalLastSeen
+//KQL Technique for FileProfile (Steven Lim @SlimKQL, https://www.linkedin.com/in/0x534c/)
+//https://www.linkedin.com/posts/0x534c_cybersecurity-sharepoint-toolshell-activity-7353097357527298050-bCKz
+//VirusTotal Links:
+//https://www.virustotal.com/gui/file/92bb4ddb98eeaf11fc15bb32e71d0a63256a0ed826a03ba293ce3a8bf057a514 // webshell
+//https://www.virustotal.com/gui/file/4a02a72aedc3356d8cb38f01f0e0b9f26ddc5ccb7c0f04a561337cf24aa84030 // backdoor
+//https://www.virustotal.com/gui/file/b39c14becb62aeb55df7fd55c814afbb0d659687d947d917512fe67973100b70 // dropper
+//https://www.virustotal.com/gui/file/fa3a74a6c015c801f5341c02be2cbdfb301c6ed60633d49fc0bc723617741af7 // PHP payload
+//https://www.virustotal.com/gui/file/e9e87f2d9446eae3e5dbca8ac4e98f1523e7a2dcf8a04197f34f20c3b1c79d60 // stager
+//https://www.virustotal.com/gui/file/b1cf5c9c3c798cae1f2b23d26ec77aa019f90eeed0f3b5d227b7490ed2593f93 // exploit
+//Alternate IOC Reference:
+//https://github.com/ontinue-research/threat-intel-iocs/blob/main/Public/2025-07-21-IOCs-SharePoint-ZeroDay.md
