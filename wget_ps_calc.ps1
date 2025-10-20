@@ -1,1 +1,0 @@
-powershell.exe -c iex "powershell.exe -EncodedCommand "U3RhcnQtUHJvY2VzcyBjYWxjLmV4ZQ=="
