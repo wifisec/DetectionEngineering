@@ -3,13 +3,13 @@
 //Author(s): Adair John Collins
 //Date: 11/03/2025
 //Version: 1
-DeviceProcessEvents  
+DeviceProcessEvents
 | where InitiatingProcessIntegrityLevel == "Medium" //Filter for medium integrity level processes (typically user-level, not elevated)  
-| where InitiatingProcessFolderPath has @"\AppData\Local\Programs\ManualReaderPro\" //Focus on processes launched from the suspicious folder associated with EvilAi  
+| where InitiatingProcessFolderPath has @"\AppData\Local\Programs\ManualReaderPro\" //Focus on processes launched from the suspicious folder associated with EvilAi
 | where FileName == "cmd.exe" //Target instances where cmd.exe is executed  
 | where InitiatingProcessVersionInfoOriginalFileName == "node.exe" //Ensure the parent process is node.exe, indicating a Node.js-based launcher  
 | where ProcessCommandLine has_all(@'cmd.exe /d /s /c "', @':\WINDOWS\system32\reg.exe QUERY "HKLM\Software\Microsoft\Cryptography" /v MachineGuid"') //Look for command lines that query MachineGuid from the registry using reg.exe  
-| where InitiatingProcessCommandLine has @"\AppData\Local\Programs\ManualReaderPro\" //Reinforce that the initiating process command line includes the suspicious folder path  
+| where InitiatingProcessCommandLine has @"\AppData\Local\Programs\ManualReaderPro\" //Reinforce that the initiating process command line includes the suspicious folder path
 | where InitiatingProcessCommandLine matches regex @"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" //Match GUID pattern in the initiating process command line, confirming MachineGuid usage  
 | sort by Timestamp, DeviceId asc //Sort results chronologically and by device for investigation
 //Reference(s):  
