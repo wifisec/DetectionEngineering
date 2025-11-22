@@ -1,0 +1,23 @@
+//Title: Potential Data Exfiltration via SyncTool
+//Author(s): Adair John Collins
+//Date: 06/17/2025
+//Version: 1
+//ASN Enrichment
+let CIDRASN = (externaldata (CIDR:string, CIDRASN:int, CIDRASNName:string)['https://firewalliplists.gypthecat.com/lists/kusto/kusto-cidr-asn.csv.zip'] with (ignoreFirstRecord=true));
+DeviceNetworkEvents
+| where InitiatingProcessParentFileName has "syncthing" or
+InitiatingProcessFileName has "syncthing" or 
+InitiatingProcessCommandLine has_any (@"syncthing -no-browser -no-restart", @"/opt/homebrew/opt/syncthing/") or
+InitiatingProcessFolderPath has @"/opt/homebrew/cellar/syncthing/"
+//Geolocation of RemoteIP
+| evaluate ipv4_lookup(CIDRASN, RemoteIP, CIDR, return_unmatched=true)
+| extend GeoIPData = geo_info_from_ip_address(RemoteIP)
+| extend GeoIPDataCountry = parse_json(GeoIPData).country
+//Non-US Connections
+//| where not(GeoIPData.country has_any("United States"))
+| project Timestamp, InitiatingProcessAccountDomain, DeviceId, DeviceName, InitiatingProcessAccountName, InitiatingProcessParentFileName, InitiatingProcessFolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine, LocalIP, LocalPort, RemoteIP, RemotePort, RemoteUrl, CIDR, CIDRASN, CIDRASNName, GeoIPDataCountry
+| sort by Timestamp desc  
+//Reference(s):
+//Threat Actor: Russian-linked threat actor UAC-0020 (also known as Vermin and SickSync)
+//https://socprime.com/blog/uac-0020-aka-vermin-attack-detection-sicksync-campaign-using-spectr-malware-and-syncthing-utility-to-target-the-armed-forces-of-ukraine/
+//https://thehackernews.com/2024/06/spectr-malware-targets-ukraine-defense.html
