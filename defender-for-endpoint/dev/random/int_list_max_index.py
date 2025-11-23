@@ -5,3 +5,8 @@ print(f"The largest value is {largest} and the index is {largest_index}")
 largest = max(sample_int_array)
 largest_index = sample_int_array.index(largest)
 print(f"The largest value is {largest} and the index is {largest_index}")
+def find_max_with_index():
+    largest = max(sample_int_array)
+    largest_index = sample_int_array.index(largest)
+    print(f"The largest value is {largest} and the index is {largest_index}")
+find_max_with_index()
