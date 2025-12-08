@@ -10,3 +10,8 @@ def find_max_with_index():
     largest_index = sample_int_array.index(largest)
     print(f"The largest value is {largest} and the index is {largest_index}")
 find_max_with_index()
+max_val, max_idx = sample_int_array[0], 0
+for i, num in enumerate(sample_int_array):
+    if num > max_val:
+        max_val, max_idx = num, i
+print(max_val, max_idx)
