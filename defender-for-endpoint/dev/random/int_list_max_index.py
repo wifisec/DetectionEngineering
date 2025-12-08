@@ -14,4 +14,4 @@ max_val, max_idx = sample_int_array[0], 0
 for i, num in enumerate(sample_int_array):
     if num > max_val:
         max_val, max_idx = num, i
-print(max_val, max_idx)
+print(f"The largest value is {max_val} and the index is {max_idx}")
