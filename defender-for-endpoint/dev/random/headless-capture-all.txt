@@ -1,0 +1,2 @@
+chrome --headless --disable-gpu --screenshot --window-size=1280,1024 https://developer.chrome.com/
+chrome --headless --disable-gpu --dump-dom https://developer.chrome.com/ > page_source.html
