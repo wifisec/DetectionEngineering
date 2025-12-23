@@ -1,0 +1,30 @@
+id: headless-capture-all
+info:
+  name: Rendered Page Screenshot and Source
+  author: Adair John Collins
+  severity: info
+  description: Navigates to a URL using a headless browser, captures a full-page screenshot to disk, and extracts the rendered HTML source code to the output.
+
+headless:
+  - steps:
+      # 1. Go to the target URL
+      - action: navigate
+        args:
+          url: "{{BaseURL}}"
+
+      # 2. Wait for the page to finish loading
+      - action: waitload
+
+      # 3. Take a screenshot and save it to disk
+      # NOTE: The directory must exist if you specify one (e.g., "output/{{Hostname}}.png")
+      # We use current directory here for simplicity.
+      - action: screenshot
+        args:
+          to: "screenshot_{{Hostname}}.png"
+          fullpage: true
+
+      # 4. Extract the rendered HTML using JavaScript
+      - action: script
+        name: rendered_html_source # This name labels the output in your results file
+        args:
+          code: "return document.documentElement.outerHTML;"
