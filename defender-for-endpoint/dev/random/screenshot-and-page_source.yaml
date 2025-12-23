@@ -1,0 +1,21 @@
+id: screenshot-with-page_source
+info:
+  name: Capture Screenshot and Page Source
+  author: Adair John Collins
+  severity: info
+
+headless:
+  - steps:
+      - action: navigate
+        args:
+          url: "{{BaseURL}}"
+      - action: waitload
+      # 1. Save the Screenshot
+      - action: screenshot
+        args:
+          to: "output/screenshots/{{host}}.png"
+      # 2. Extract the Page Source
+      - action: script
+        args:
+          code: "resp = document.documentElement.outerHTML; resp;"
+        name: page_source
