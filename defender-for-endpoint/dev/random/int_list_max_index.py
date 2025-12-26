@@ -15,4 +15,4 @@ for i, num in enumerate(sample_int_array):
     if num > max_val:
         max_val, max_idx = num, i
 print(f"The largest value is {max_val} and the index is {max_idx}")
-max(list(enumerate(sample_int_array))
+#max(list(enumerate(sample_int_array))
