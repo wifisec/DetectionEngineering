@@ -1,3 +1,12 @@
+$TARGET_DOMAIN = "www.archive.org" # Example
+$TARGET_URL = "https://www.archive.org/" #Example
+# Chrome
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-chrome --headless --disable-gpu --screenshot --window-size=1280,1024 https://developer.chrome.com/
-chrome --headless --disable-gpu --dump-dom https://developer.chrome.com/ > page_source.html
+chrome --headless --disable-gpu --screenshot --window-size=1280,1024 $TARGET_URL
+chrome --headless --disable-gpu --dump-dom $TARGET_URL > $TARGET_URL_page_source.html
+# Nuclei
+nuclei -u $TARGET -headless -store-resp -id screenshot
+# Nmap
+sudo nmap -sTCV -Pn --script=banner,http-title,http-robots.txt,ssl-cert,ssh-hostkey,rdp-ntlm-info -Pn -p 22,80,443 $TARGET_DOMAIN --traceroute --reason -vv -oA $TARGET_DOMAIN
+# NSE
+# mysql-info,mysql-users,pgsql-info,mongodb-info,redis-info
