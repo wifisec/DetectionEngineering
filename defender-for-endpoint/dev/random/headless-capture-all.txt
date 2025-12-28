@@ -20,3 +20,4 @@ sudo nmap -sTCV -Pn --script=banner,http-title,http-robots.txt,ssl-cert,ssh-host
 # redis-info 6379/tcp
 
 ##chrome_capture.zsh
+https://github.com/wifisec/DetectionEngineering/blob/main/defender-for-endpoint/dev/random/chrome_capture.zsh
