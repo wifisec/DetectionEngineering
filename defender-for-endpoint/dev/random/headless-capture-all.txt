@@ -11,7 +11,10 @@ chrome --headless --disable-gpu --dump-dom $URL > $URL_page_source.html
 nuclei -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -u $URL -headless -store-resp -id screenshot
 
 # Nmap
-sudo nmap -sTCV -Pn --script=banner,http-title,http-robots.txt,ssl-cert,ssh-hostkey,rdp-ntlm-info -Pn -p 22,80,443 $DOMAIN --traceroute --reason -vv -oA $DOMAIN
+sudo nmap -sTCV -T4 -Pn --script=banner,http-title,http-robots.txt,ssl-cert,ssh-hostkey,rdp-ntlm-info -Pn -p 22,80,443 $DOMAIN --traceroute --reason -vv -oA $DOMAIN
+# --min-rate 500 --max-retries 2 --max-rtt-timeout 1500ms
+# --top-ports 1000
+# --open
 # NSE
 # mysql-info 3306/tcp
 # mysql-users 3306/tcp
