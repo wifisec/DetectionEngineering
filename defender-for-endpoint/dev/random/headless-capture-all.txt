@@ -1,12 +1,107 @@
-$TARGET_DOMAIN = "www.archive.org" # Example
-$TARGET_URL = "https://www.archive.org/" #Example
+$DOMAIN = "www.archive.org" # Example
+$URL = "https://www.archive.org/" #Example
+$IP = 207.241.224.2 #Example
 # Chrome
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-chrome --headless --disable-gpu --screenshot --window-size=1280,1024 $TARGET_URL
-chrome --headless --disable-gpu --dump-dom $TARGET_URL > $TARGET_URL_page_source.html
+chrome --headless --disable-gpu --screenshot --window-size=1280,1024 $URL
+chrome --headless --disable-gpu --dump-dom $URL > $URL_page_source.html
 # Nuclei
-nuclei -u $TARGET -headless -store-resp -id screenshot
+nuclei -u $URL -headless -store-resp -id screenshot
 # Nmap
-sudo nmap -sTCV -Pn --script=banner,http-title,http-robots.txt,ssl-cert,ssh-hostkey,rdp-ntlm-info -Pn -p 22,80,443 $TARGET_DOMAIN --traceroute --reason -vv -oA $TARGET_DOMAIN
+sudo nmap -sTCV -Pn --script=banner,http-title,http-robots.txt,ssl-cert,ssh-hostkey,rdp-ntlm-info -Pn -p 22,80,443 $DOMAIN --traceroute --reason -vv -oA $DOMAIN
 # NSE
-# mysql-info,mysql-users,pgsql-info,mongodb-info,redis-info
+# mysql-info 3306/tcp
+# mysql-users 3306/tcp
+# pgsql-info 5432/tcp
+# mongodb-info 27017/tcp
+# redis-info 6379/tcp
+
+##chrome_capture.zsh
+
+#!/bin/zsh
+
+# --- CONFIGURATION ---
+# Path to your Google Chrome or Chromium binary
+CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+OUTPUT_DIR="results"
+
+# Define a standard Chrome User-Agent (Standard macOS Chrome)
+# We force both Curl and Headless Chrome to use this to avoid "HeadlessChrome" detection.
+USER_AGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+# --- CHECK ARGS ---
+if [[ -z "$1" ]]; then
+    echo "Usage: $0 <list_of_ips.txt>"
+    exit 1
+fi
+
+INPUT_FILE="$1"
+
+# --- CHECK DEPENDENCIES ---
+if [[ ! -f "$CHROME_BIN" ]]; then
+    echo "Error: Chrome binary not found at $CHROME_BIN"
+    exit 1
+fi
+
+# --- MAIN LOOP ---
+echo "Starting capture on list: $INPUT_FILE"
+echo "Using User-Agent: $USER_AGENT"
+
+while IFS= read -r target || [[ -n "$target" ]]; do
+    # 1. CLEANUP INPUT
+    target=$(echo "$target" | xargs)
+    if [[ -z "$target" ]]; then continue; fi
+    
+    # Ensure protocol
+    if [[ ! "$target" =~ ^http ]]; then
+        full_url="http://$target"
+    else
+        full_url="$target"
+    fi
+
+    # Extract clean folder name
+    folder_name=$(echo "$target" | sed 's|http[s]*://||g' | tr ':' '_')
+    target_path="$OUTPUT_DIR/$folder_name"
+
+    echo "---------------------------------------------------"
+    echo "Target: $full_url"
+    echo "Output: $target_path"
+
+    mkdir -p "$target_path"
+
+    # 2. GET RAW PAGE SOURCE (via Curl)
+    # Added -A flag to set the User-Agent
+    echo "  > Downloading Raw Source..."
+    if curl -s -L -k -A "$USER_AGENT" --max-time 10 "$full_url" -o "$target_path/raw_source.html"; then
+        echo "    [OK] Saved raw_source.html"
+    else
+        echo "    [FAIL] Curl could not connect"
+        echo "ERROR: Connection Failed" > "$target_path/error.log"
+    fi
+
+    # 3. GET RENDERED DOM (via Chrome)
+    # Added --user-agent flag to override the default "HeadlessChrome" signature
+    echo "  > Dumping Rendered DOM..."
+    "$CHROME_BIN" --headless --disable-gpu --user-agent="$USER_AGENT" --dump-dom "$full_url" > "$target_path/rendered_dom.html" 2>/dev/null
+    
+    if [[ -s "$target_path/rendered_dom.html" ]]; then
+        echo "    [OK] Saved rendered_dom.html"
+    else
+        echo "    [FAIL] Empty DOM received"
+    fi
+
+    # 4. GET SCREENSHOT (via Chrome)
+    # Screenshot also needs the UA to ensure the page renders the same way
+    echo "  > Taking Screenshot..."
+    "$CHROME_BIN" --headless --disable-gpu --user-agent="$USER_AGENT" --screenshot="$target_path/screenshot.png" --window-size=1280,1024 "$full_url" 2>/dev/null
+
+    if [[ -f "$target_path/screenshot.png" ]]; then
+        echo "    [OK] Saved screenshot.png"
+    else
+        echo "    [FAIL] Screenshot failed"
+    fi
+
+done < "$INPUT_FILE"
+
+echo "---------------------------------------------------"
+echo "Done. Results saved in $OUTPUT_DIR/"
